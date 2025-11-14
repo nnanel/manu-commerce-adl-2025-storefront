@@ -12,7 +12,18 @@
     "install:dropins": "node build.mjs && node postinstall.js",
     "postinstall": "npm run install:dropins",
     "postupdate": "npm run install:dropins",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:mobile": "playwright test --project='Mobile Chrome' --project='Mobile Safari'",
+    "test:report": "playwright show-report playwright-report",
+    "test:ratings": "playwright test tests/ratings.spec.js",
+    "pretest": "npx playwright install --with-deps",
+    "predeploy": "./scripts/pre-deploy.sh"
   },
   "repository": {
     "type": "git",
@@ -27,6 +38,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "7.25.9",
     "@dropins/build-tools": "1.0.1",
+    "@playwright/test": "^1.56.1",
     "eslint": "8.57.1",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.31.0",

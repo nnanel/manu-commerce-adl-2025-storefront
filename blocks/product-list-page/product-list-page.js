@@ -18,6 +18,9 @@ import { events } from '@dropins/tools/event-bus.js';
 import { readBlockConfig } from '../../scripts/aem.js';
 import { fetchPlaceholders, getProductLink } from '../../scripts/commerce.js';
 
+// Ratings
+import { fetchProductRating, createRatingElement } from '../../scripts/ratings.js';
+
 // Initializers
 import '../../scripts/initializers/search.js';
 import '../../scripts/initializers/wishlist.js';
@@ -195,7 +198,7 @@ export default async function decorate(block) {
     }
   }, { eager: true });
 
-  // Listen for search results (event is fired after the block is rendered; eager: false)
+  // Listen for search results to update URL and add ratings (eager: true to catch initial load)
   events.on('search/result', (payload) => {
     // update URL with new search params
     const url = new URL(window.location.href);
@@ -218,7 +221,52 @@ export default async function decorate(block) {
 
     // Update the URL
     window.history.pushState({}, '', url.toString());
-  }, { eager: false });
+
+    // Add ratings to product cards after render
+    // Use longer timeout to ensure DOM is fully rendered
+    setTimeout(() => {
+      const productItems = payload.result?.items || [];
+      const productCards = $productList.querySelectorAll('.dropin-product-item-card');
+
+      productCards.forEach((card, index) => {
+        if (index < productItems.length) {
+          const product = productItems[index];
+          const contentContainer = card.querySelector('.dropin-product-item-card__content');
+          const productNameSlot = contentContainer?.querySelector('[data-slot="ProductName"]');
+
+          if (productNameSlot && product?.sku) {
+            // Check if rating already exists
+            const existingRating = card.querySelector('.product-rating');
+            
+            if (!existingRating) {
+                  // Fetch and add rating/distribution/reviews
+                  fetchProductRating(product.sku).then((ratingData) => {
+                    if (ratingData) {
+                      
+                      // Create rating element WITH distribution, reviews, SKU, and pagination data (enables modal with load more)
+                      const ratingElement = createRatingElement(
+                        ratingData.averageRating,
+                        ratingData.totalCount,
+                        ratingData.distribution, // Pass distribution to enable modal
+                        ratingData.reviews, // Pass reviews to display in modal
+                        product.sku, // Pass SKU for loading more reviews
+                        ratingData.pagination, // Pass pagination data for load more button
+                      );
+                  
+                  // Insert rating after ProductName slot
+                  if (productNameSlot.nextSibling) {
+                    contentContainer.insertBefore(ratingElement, productNameSlot.nextSibling);
+                  } else {
+                    contentContainer.appendChild(ratingElement);
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+    }, 300);
+  }, { eager: true });
 }
 
 function getSortFromParams(sortParam) {
