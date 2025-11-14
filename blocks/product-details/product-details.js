@@ -189,7 +189,15 @@ export default async function decorate(block) {
     })($gallery),
 
     // Header
-    pdpRendered.render(ProductHeader, {})($header),
+    pdpRendered.render(ProductHeader, {})($header).then(() => {
+      // Customize SKU display: prefix with "SKU:" and make bold
+      const skuElement = $header.querySelector('.pdp-header__sku');
+      if (skuElement && skuElement.textContent) {
+        const skuText = skuElement.textContent.trim();
+        skuElement.textContent = `SKU: ${skuText}`;
+        skuElement.style.fontWeight = 'bold';
+      }
+    }),
 
     // Price
     pdpRendered.render(ProductPrice, {})($price),
