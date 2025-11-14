@@ -1,3 +1,5 @@
+/* Import ratings styles */
+@import url('../../styles/ratings.css');
 
 .block.product-list-page .search__wrapper {
     display: grid;

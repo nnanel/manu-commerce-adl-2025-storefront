@@ -22,6 +22,9 @@ import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js
 import { readBlockConfig } from '../../scripts/aem.js';
 import { fetchPlaceholders, getProductLink } from '../../scripts/commerce.js';
 
+// Ratings
+import { fetchProductRating, createRatingElement } from '../../scripts/ratings.js';
+
 // Initializers
 import '../../scripts/initializers/recommendations.js';
 import '../../scripts/initializers/wishlist.js';
@@ -141,6 +144,35 @@ export default async function decorate(block) {
           userViewHistory: context.userViewHistory,
           userPurchaseHistory: context.userPurchaseHistory,
           slots: {
+            Title: async (ctx) => {
+              const { item } = ctx;
+              const titleWrapper = document.createElement('div');
+              titleWrapper.className = 'recommendations-product-title-wrapper';
+              
+              // Create title element
+              const titleLink = document.createElement('a');
+              titleLink.href = createProductLink(item);
+              titleLink.className = 'recommendations-product-title';
+              titleLink.textContent = item.name;
+              titleWrapper.appendChild(titleLink);
+              
+    // Fetch and add rating
+    const ratingData = await fetchProductRating(item.sku);
+    if (ratingData) {
+      // Create rating element WITH distribution, reviews, SKU, and pagination data (enables modal with load more)
+      const ratingElement = createRatingElement(
+        ratingData.averageRating,
+        ratingData.totalCount,
+        ratingData.distribution, // Pass distribution to enable modal
+        ratingData.reviews, // Pass reviews to display in modal
+        item.sku, // Pass SKU for loading more reviews
+        ratingData.pagination, // Pass pagination data for load more button
+      );
+      titleWrapper.appendChild(ratingElement);
+    }
+              
+              ctx.replaceWith(titleWrapper);
+            },
             Footer: (ctx) => {
               const wrapper = document.createElement('div');
               wrapper.className = 'footer__wrapper';

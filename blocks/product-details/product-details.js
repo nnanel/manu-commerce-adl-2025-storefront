@@ -33,6 +33,9 @@ import {
   getProductLink,
 } from '../../scripts/commerce.js';
 
+// Ratings
+import { fetchProductRating, createRatingElement } from '../../scripts/ratings.js';
+
 // Initializers
 import { IMAGES_SIZES } from '../../scripts/initializers/pdp.js';
 import '../../scripts/initializers/cart.js';
@@ -224,6 +227,39 @@ export default async function decorate(block) {
       product,
     })($wishlistToggleBtn),
   ]);
+
+  // Add product rating next to quantity field
+  events.on('pdp/data', async (productData) => {
+    if (productData?.sku) {
+      const ratingData = await fetchProductRating(productData.sku);
+      if (ratingData) {
+        // Remove any existing rating element
+        const existingRating = block.querySelector('.product-rating--quantity-side');
+        if (existingRating) {
+          existingRating.remove();
+        }
+        
+      // Create rating element with distribution, reviews, SKU, and pagination data (enables modal with load more)
+      const ratingElement = createRatingElement(
+        ratingData.averageRating,
+        ratingData.totalCount,
+        ratingData.distribution, // Pass distribution to enable clickable count
+        ratingData.reviews, // Pass reviews to display in modal
+        productData.sku, // Pass SKU for loading more reviews
+        ratingData.pagination, // Pass pagination data for load more button
+      );
+        
+        // Add a special class for positioning next to quantity
+        ratingElement.classList.add('product-rating--quantity-side');
+        
+        // Insert rating in the configuration section, after quantity
+        const configSection = block.querySelector('.product-details__configuration');
+        if (configSection) {
+          configSection.appendChild(ratingElement);
+        }
+      }
+    }
+  }, { eager: true });
 
   // Configuration – Button - Add to Cart
   const addToCart = await UI.render(Button, {

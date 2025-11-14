@@ -1,3 +1,6 @@
+/* Import ratings styles */
+@import url('../../styles/ratings.css');
+
 .product-details__wrapper {
   display: grid;
   grid-template-columns: repeat(var(--grid-1-columns), 1fr);
@@ -71,6 +74,12 @@
   margin-top: var(--spacing-xsmall);
 }
 
+/* Mobile: rating appears below quantity */
+.product-rating--quantity-side {
+  margin-top: var(--spacing-small);
+  grid-column: 1 / span 4;
+}
+
 @media (min-width: 900px) {
   .product-details__wrapper {
     grid-template-columns: repeat(var(--grid-3-columns), 1fr);
@@ -113,5 +122,15 @@
 
   .product-details__quantity {
     grid-column: 1 / span 2;
+  }
+
+  .product-rating--quantity-side {
+    grid-column: 3 / span 2;
+    grid-row: 2; /* Same row as quantity */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: var(--spacing-medium);
+    margin-top: 0;
   }
 }

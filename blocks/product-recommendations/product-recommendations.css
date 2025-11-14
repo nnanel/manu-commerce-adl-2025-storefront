@@ -1,3 +1,6 @@
+/* Import ratings styles */
+@import url('../../styles/ratings.css');
+
 .product-recommendations .scrollable {
     overflow-x: scroll;
     scroll-snap-type: x mandatory;

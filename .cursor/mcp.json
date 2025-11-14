@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "commerce-documentation-rag": {
+      "command": "bash",
+      "args": ["/Users/mnegri/Documents/commerce-adl-2025/storefront/mcp-server/start-mcp.sh"],
+      "cwd": "/Users/mnegri/Documents/commerce-adl-2025/storefront/mcp-server"
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"],
+      "cwd": "/Users/mnegri/Documents/commerce-adl-2025/storefront"
+    }
+  }
+}
